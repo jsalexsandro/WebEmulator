@@ -8,7 +8,6 @@
 * Python Modules Useds
   * PyQt5
   * bs4 
-  * urlib 
   * json
   * requests 
   * pyautoqui
@@ -26,7 +25,6 @@ Requiriments:
  pip install PyQt5
  pip install PyQtWebEngine
  pip install bs4
- pip install urllib
  pip install pyautogui
 </pre>
 </code>

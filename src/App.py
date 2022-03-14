@@ -1,8 +1,7 @@
-from PyQt5.QtWidgets import QMainWindow,QFrame,QPushButton,QMessageBox
+from PyQt5.QtWidgets import QMainWindow,QFrame,QPushButton
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtGui import QFont
 from PyQt5 import QtCore
-from urllib.request import urlopen
 import bs4
 import pyautogui
 import json
@@ -40,9 +39,9 @@ class WindowApp(QMainWindow):
         self.LeftBar()
         self.setStyles()
         self.openLeftBar = False
-        try:
-            self.setStatusBar()
-        except:pass
+        # try:
+        #     self.setStatusBar()
+        # except:pass
 
     def Move(self):
         x,y = pyautogui.position()
@@ -69,17 +68,22 @@ class WindowApp(QMainWindow):
         self.status.show()
 
     def setStatusBar(self):
-        html = urlopen(self.local).read()
-        res = bs4.BeautifulSoup(html,"html5lib")
-
-        themecolor =  str(res.findAll("meta",{"name":"theme-color"})[0])
-        tag = themecolor.split('"')
-        color = ""
-        for c,i in enumerate(tag):
-            if ("content" in i):
-                color = tag[c+1]
-        print(color)
-        self.status.setStyleSheet(f"background-color:{color}")
+        def Run(html):
+            try:
+                res = bs4.BeautifulSoup(html,"html5lib")
+                color = "red"
+                themecolor =  res.findAll("meta",{"name":"theme-color"})
+                for tag in themecolor:
+                    a = tag.get("content")
+                    color = a
+                print(color)
+                self.status.setStyleSheet(f"background-color:{color}")
+            except:
+                pass    
+        try:
+            self.web.page().runJavaScript("document.documentElement.outerHTML",Run)
+        except:
+            print("Not possible run JS")
 
     def Nocth(self):
         self.notch = QFrame(self.frame)
@@ -90,12 +94,16 @@ class WindowApp(QMainWindow):
     def View(self):
         self.web = QWebEngineView(self.frame)   
         self.web.setGeometry(20,45,self.width-24,self.height - 50)
+        self.web.loadFinished.connect(self.loadView)
         try :
             get(self.local)
             self.web.setUrl(QtCore.QUrl(self.local))
         except:
             self.web.setHtml(f"<h1>{self.local} not listen <h1>")
         self.web.show()
+
+    def loadView(self):
+        self.setStatusBar()
 
     def LeftBar(self):
         self.left = QFrame(self)
@@ -122,7 +130,7 @@ class WindowApp(QMainWindow):
         self.close_bar.clicked.connect(self.Open)
         self.close_bar.setText("×")
         self.close_bar.close()
- 
+
         self.reload = QPushButton(self)
         self.reload.setGeometry(self.width+50,90,60,60)
         self.reload.setFont(QFont("Times",30))
@@ -238,8 +246,6 @@ QPushButton:hover {
 
     def Reload(self):
         self.web.reload()
-        try:self.setStatusBar()
-        except:pass
 
     def keyPressEvent(self,event):
         if event.key() == QtCore.Qt.Key_F5:

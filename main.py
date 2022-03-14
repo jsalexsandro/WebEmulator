@@ -24,9 +24,21 @@ for i in command_line:
         permited_init = False
         break
 
-    if (i == "--use-config" or i == "-u"):
+    if (i == "--use" or i == "-u"):
         print("Initial Config!")
         use = True
+        break
+
+    if (i == "--help" or i == "-h"):
+        print("""
+Commmand line Options:
+    use "device <...arguments>"
+
+    use -h or --help "For help"
+    use -i or --init "For create device.config"
+    use -u or --use  "For use device.config if exist"
+""")
+        permited_init = False
         break
     
 if (permited_init == True):
